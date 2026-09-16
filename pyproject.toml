@@ -7,7 +7,9 @@ authors = [
     { name = "PENTELA RAGHU RAM", email = "raghuram@example.com" }
 ]
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "pygame-ce>=2.5.8",
+]
 
 [project.scripts]
 graphvisualizer = "graphvisualizer:main"
@@ -15,3 +17,6 @@ graphvisualizer = "graphvisualizer:main"
 [build-system]
 requires = ["uv_build>=0.12.14,<0.13.0"]
 build-backend = "uv_build"
+
+[tool.uv.extra-build-dependencies]
+pygame = ["setuptools"]
