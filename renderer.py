@@ -15,7 +15,7 @@ class Render:
             end_pos=(edge.end.cords.x,edge.end.cords.y)
             pygame.draw.line(screen,edge.color,start_pos,end_pos,edge.thickness)
         
-        
+         
         for vertex_id in self.graph.vertices:
 
             vertex=self.graph.vertices[vertex_id] 
@@ -25,10 +25,12 @@ class Render:
             pygame.draw.circle(screen,vertex.color,pos,vertex.radius) 
     
     def animate_bfs(self):
-        pass 
+        
+        pass
     
     def animate_dfs(self):
         pass 
+
     
    
         
