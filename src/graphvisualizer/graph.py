@@ -1,5 +1,5 @@
 from collections import deque
-
+import pygame
 class Coordinates:
     
     def __init__(self,x,y):
@@ -10,16 +10,20 @@ class Coordinates:
 
 class Node:
     id_=0
-    def __init__(self,x,y):
+    radius=10 
 
-        self.color=None 
+    def __init__(self,x,y,data=None):
+
+        self.color=(225,225,225)
         self.cords=Coordinates(x,y)
-        self.data=None 
-        self.radius=None 
+        self.data= data or Node.id_
+        self.radius=Node.radius
         self.id=Node.id_
         Node.id_+=1 
-    
+    @classmethod
+    def set_radius(cls,radius):
 
+        cls.radius=radius
 
 
 class Edge:
@@ -35,32 +39,42 @@ class Edge:
 
 class Graph:
 
-    def __init__(self):
+    def __init__(self, radius=None):
 
-        self.vertices={}
-        self.edges=[]
-        self.adjList=[]
+        if radius:
+            Node.set_radius(radius)
 
-    def addNode(self,x,y):
+        self.vertices = {}
 
-        newNode=Node(x,y)
+        self.edges = []
+      
+        self.adjList = {} 
 
-        self.vertices[newNode.id]=newNode 
+    def addNode(self, x, y, data=None):
+
+        newNode = Node(x, y, data)
+
+        self.vertices[newNode.id] = newNode 
         
+        self.adjList[newNode.id] = []
         
-    def addEdge(self,id1,id2,directed=False):
+    def addEdge(self, id1, id2, directed=False):
 
-        if id1 in self.vertices and id2 in self.vertices:     
+        if id1 in self.vertices and id2 in self.vertices:  
 
-            vertex1=self.vertices[id1]
-            vertex2=self.vertices[id2]
-            newEdge=Edge(vertex1,vertex2) 
+            vertex1 = self.vertices[id1]
+            vertex2 = self.vertices[id2]
+
+            newEdge = Edge(vertex1, vertex2) 
+
+            self.edges.append(newEdge) 
             
+          
             self.adjList[id1].append(vertex2)
 
             if not directed:
-
-                self.adj_list[id2].append(vertex1)
+               
+                self.adjList[id2].append(vertex1)
 
     
     
@@ -107,5 +121,4 @@ class Graph:
                     queue.append(neighbor) 
         
         return order 
-    
 
