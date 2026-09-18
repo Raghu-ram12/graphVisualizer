@@ -19,25 +19,22 @@ class Node:
 
     def __init__(self, x, y, data=None):
 
-        self.color = Colors.WHITE
+        self.color = Colors.NODE_DEFAULT
         self.cords = Coordinates(x, y)
-        self.data = data or Node.id_
+        self.data  = data or Node.id_
         self.radius = Node.radius
-        self.id = Node.id_
+        self.id    = Node.id_
         Node.id_ += 1
 
     @classmethod
     def set_radius(cls, radius):
-
         cls.radius = radius
 
     def highlight(self):
-
-        self.color = Colors.SELECTED
+        self.color = Colors.NODE_SELECTED
 
     def unHighlight(self):
-
-        self.color = Colors.WHITE
+        self.color = Colors.NODE_DEFAULT
 
 
 class Edge:
@@ -133,4 +130,4 @@ class Graph:
                     visited.add(neighbor.id)
                     queue.append(neighbor.id)
 
-        return order
+        return order   
