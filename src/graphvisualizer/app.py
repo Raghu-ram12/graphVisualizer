@@ -34,7 +34,7 @@ class Button:
         self.badge_font = pygame.font.SysFont("consolas", 14, bold=True)
 
         self.is_hovered = False
-        self.is_active  = False   # set by App to reflect current mode
+        self.is_active  = False   
 
     def draw(self, surface):
         # Background
@@ -47,7 +47,7 @@ class Button:
 
         draw_rounded_rect(surface, bg, self.rect, radius=8)
 
-        # Accent strip (left edge)
+        
         strip_w = self.ACCENT_W + 2 if self.is_active else self.ACCENT_W
         strip_rect = pygame.Rect(self.rect.x, self.rect.y, strip_w, self.rect.height)
         draw_rounded_rect(surface, self.accent_color, strip_rect, radius=4)
@@ -178,7 +178,7 @@ class App:
 
         self.__addButtons()
 
-    # ── Button setup ──────────────────────────────────────────────────────────
+   
 
     def __addButtons(self):
         px = 16
@@ -331,10 +331,10 @@ class App:
     def drawPanel(self):
         screen_h = self.screen.get_height()
 
-        # Keep danger button pinned to panel bottom regardless of window size
+      
         self.danger_button.rect.y = screen_h - 50
 
-        # ── Base panel ────────────────────────────────────────────────────────
+      
         pygame.draw.rect(self.screen, Colors.BG_PANEL,
                          pygame.Rect(0, 0, self.PANEL_WIDTH, screen_h))
 
@@ -350,7 +350,7 @@ class App:
         title = self.font_title.render("GRAPH VISUALIZER", True, Colors.TEXT_PRIMARY)
         self.screen.blit(title, (16, 20))
 
-        # ── Mode badge ────────────────────────────────────────────────────────
+      
         mode_name, mode_color = self.MODE_META.get(
             App.getAppMode(), ("Unknown", Colors.GRAY)
         )
@@ -364,14 +364,11 @@ class App:
                          (badge_rect.x + 20,
                           badge_rect.centery - badge_text.get_height() // 2))
 
-        # ── MODES section ─────────────────────────────────────────────────────
-        # Separator at 104, label at 108, buttons at 130/178/226 (each h=40)
-        # Last button ends at 266.
+        
         self._draw_separator(104)
         self._draw_section_label("MODES", 108)
 
-        # ── STATS section ─────────────────────────────────────────────────────
-        # Start right after mode buttons (ends at 266) with a small gap.
+     
         stats_sep_y   = 274
         stats_label_y = 278
         stats_start_y = 296
@@ -397,25 +394,23 @@ class App:
             self.screen.blit(vsurf, (self.PANEL_WIDTH - vsurf.get_width() - 16, sy))
             sy += 24
 
-        # ── ANIMATION section (animate mode only, below stats) ─────────────
+       
         if App.getAppMode() == "animate":
-            anim_sep_y   = sy + 8          # separator just below last stat row
+            anim_sep_y   = sy + 8          
             anim_label_y = anim_sep_y + 4
-            anim_ctrl_y  = anim_label_y + 18   # controls row
+            anim_ctrl_y  = anim_label_y + 18   
 
             self._draw_separator(anim_sep_y)
             self._draw_section_label("ANIMATION SPEED / ALGO", anim_label_y)
 
-            # Reposition SmallButton rects to sit at anim_ctrl_y
+            
             px = 16
             sw = 38
             xs = [px, px + sw + 4, px + sw*2 + 12, px + sw*2 + 76]
             for ctrl, x in zip(self.anim_controls, xs):
                 ctrl.rect.y = anim_ctrl_y
 
-        # ── Status bar + Clear Graph ──────────────────────────────────────────
-        # Clear Graph is at screen_h-50 (h=38) → occupies [screen_h-50 .. screen_h-12]
-        # Status bar sits above it with comfortable padding.
+       
         status_sep_y = screen_h - 100
         status_y     = status_sep_y + 6
 
@@ -424,7 +419,7 @@ class App:
         status_surf = self.font_status.render(msg, True, Colors.TEXT_STATUS)
         self.screen.blit(status_surf, (16, status_y))
 
-        # Thin separator just above Clear Graph button for visual separation
+       
         self._draw_separator(screen_h - 58)
 
     def _draw_canvas_grid(self):
@@ -453,7 +448,7 @@ class App:
     def getAppMode(cls):
         return cls.__mode
 
-    # ── Main loop ─────────────────────────────────────────────────────────────
+  
 
     def run(self):
         while self.running:

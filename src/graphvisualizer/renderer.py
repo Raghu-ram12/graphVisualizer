@@ -14,33 +14,33 @@ class Render:
         self.orderList      = None
         self.prev           = None
 
-    # ── helpers ───────────────────────────────────────────────────────────────
+   
 
     def _node_ring(self, pos, radius, ring_color, ring_thickness=3):
         """Draw a colored ring around a node by overdrawing a larger circle first."""
         pygame.draw.circle(self.screen, ring_color, pos, radius + ring_thickness)
 
-    # ── main draw ─────────────────────────────────────────────────────────────
+    
 
     def draw_graph(self):
 
-        # ── Edges ─────────────────────────────────────────────────────────────
+      
         for edge in self.graph.edges:
 
             start_pos = (edge.start_node.cords.x, edge.start_node.cords.y)
             end_pos   = (edge.end_node.cords.x,   edge.end_node.cords.y)
 
-            # Visited edges are colored; idle edges are muted
+          
             color = edge.color if edge.color else Colors.EDGE_DEFAULT
 
             if color == Colors.EDGE_DEFAULT:
-                # Anti-aliased line for crisper diagonal edges
+                
                 pygame.draw.aaline(self.screen, color, start_pos, end_pos)
             else:
                 pygame.draw.line(self.screen, color, start_pos, end_pos,
                                  edge.thickness + 1)
 
-        # ── Nodes ─────────────────────────────────────────────────────────────
+    
         font = pygame.font.SysFont("consolas", 16, bold=True)
 
         for vertex_id, vertex in self.graph.vertices.items():
@@ -49,7 +49,7 @@ class Render:
             radius = vertex.radius
             color  = vertex.color
 
-            # Draw ring first (behind the filled circle)
+          
             if color == Colors.NODE_SELECTED:
                 self._node_ring(pos, radius, Colors.NODE_SELECTED, ring_thickness=4)
             elif color == Colors.NODE_VISITED:
@@ -57,20 +57,19 @@ class Render:
             elif color == Colors.NODE_CURRENT:
                 self._node_ring(pos, radius, Colors.NODE_CURRENT, ring_thickness=4)
 
-            # Filled node on top
+            
             pygame.draw.circle(self.screen, color, pos, radius)
 
-            # White label
             text_surface = font.render(str(vertex.data), True, Colors.TEXT_NODE)
             text_rect    = text_surface.get_rect(center=pos)
             self.screen.blit(text_surface, text_rect)
 
-    # ── animation ─────────────────────────────────────────────────────────────
+  
 
     def startAnimation(self, start_id, mode="DFS"):
         """Reset all node/edge colors then build the traversal order."""
 
-        # Reset nodes
+        
         for vertex in self.graph.vertices.values():
             vertex.color = Colors.NODE_DEFAULT
 
@@ -107,12 +106,12 @@ class Render:
 
             current_id = self.orderList[self.animationIndex]
 
-            # Mark previous node as fully visited
+            
             if self.prev is not None:
                 self.prev.color = Colors.NODE_VISITED
                 self._color_edge_between(self.prev.id, current_id)
 
-            # Highlight current node
+           
             current_node       = self.graph.vertices[current_id]
             current_node.color = Colors.NODE_CURRENT
             self.prev          = current_node
