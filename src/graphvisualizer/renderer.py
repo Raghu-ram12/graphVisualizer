@@ -13,6 +13,7 @@ class Render:
         self.animationSpeed = 500
         self.orderList      = None
         self.prev           = None
+        self.physics = None
 
    
 
@@ -21,10 +22,25 @@ class Render:
         pygame.draw.circle(self.screen, ring_color, pos, radius + ring_thickness)
 
     
+    def toggle_physics(self):
+        """Start or stop the physics simulation."""
+        if self.physics is None:
+            from graphvisualizer.physics import PhysicsEngine
+            screen_w, screen_h = self.screen.get_size()
+            self.physics = PhysicsEngine(
+                width=screen_w - 240,
+                height=screen_h,
+            )
+        if self.physics.running:
+            self.physics.stop()
+        else:
+            self.physics.start()
 
-    def draw_graph(self):
+    def draw_graph(self, delta_t=1.0):
 
-      
+        if self.physics is not None and self.physics.running:
+            self.physics.tick(self.graph, delta_t=delta_t)
+
         for edge in self.graph.edges:
 
             start_pos = (edge.start_node.cords.x, edge.start_node.cords.y)

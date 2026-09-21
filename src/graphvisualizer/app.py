@@ -3,14 +3,8 @@ from graphvisualizer.renderer import Render
 import pygame
 from graphvisualizer.config import Colors
 
-
-
-
 def draw_rounded_rect(surface, color, rect, radius=8):
     pygame.draw.rect(surface, color, rect, border_radius=radius)
-
-
-
 
 class Button:
     """Mode button with a colored left-accent strip and a keyboard shortcut badge."""
@@ -179,6 +173,24 @@ class App:
         self.__addButtons()
 
    
+    def _toggle_physics(self):
+        """Toggle the physics auto-layout on/off."""
+        from graphvisualizer.physics import PhysicsEngine
+
+        if self.render.physics is None:
+            screen_w, screen_h = self.screen.get_size()
+            self.render.physics = PhysicsEngine(
+                width=screen_w - self.PANEL_WIDTH,
+                height=screen_h,
+            )
+            self.render.physics.start()
+        elif self.render.physics.running:
+            self.render.physics.stop()
+        else:
+            self.render.physics.start()
+
+        for v in self.graph.vertices.values():
+            v.color = Colors.NODE_DEFAULT 
 
     def __addButtons(self):
         px = 16
@@ -195,6 +207,13 @@ class App:
                    accent_color=Colors.ACCENT_ANIMATE, shortcut="A",
                    action=lambda: self._switch_mode("animate")),
         ]
+
+        
+        self.physics_button = SmallButton(
+            px, 430, bw, 38, "Auto Layout",
+            action=self._toggle_physics,
+            active_color=Colors.ACCENT_ANIMATE,
+        )
 
         # anim_controls y is updated dynamically in draw_buttons each frame
         sw = 38
@@ -235,11 +254,11 @@ class App:
         self._sync_active_states()
 
     def _clear_graph(self):
-        self.graph.vertices.clear()
-        self.graph.edges.clear()
-        self.graph.adjList.clear()
+        
+        self.graph.clearGraph()
         self.render.orderList = None
         self.prevVertex       = None
+        
 
     def _sync_active_states(self):
         mode_map = ["addVertex", "addEdge", "animate"]
@@ -248,6 +267,12 @@ class App:
         for ctrl in self.anim_controls:
             if ctrl.text in ("DFS", "BFS"):
                 ctrl.is_active = (ctrl.text == self._anim_mode)
+
+        # Physics button active state
+        if self.render.physics is not None:
+            self.physics_button.is_active = self.render.physics.running
+        else:
+            self.physics_button.is_active = False
 
   
 
@@ -263,7 +288,8 @@ class App:
         return None
 
     def handleUserInput(self):
-        all_buttons = self.mode_buttons + self.anim_controls + [self.danger_button]
+        all_buttons = (self.mode_buttons + [self.physics_button]
+                       + self.anim_controls + [self.danger_button])
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -281,6 +307,9 @@ class App:
                     self._switch_mode("addVertex")
                 elif event.key == pygame.K_a:
                     self._switch_mode("animate")
+
+                elif event.key == pygame.K_l:
+                    self._toggle_physics()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 consumed = False
@@ -419,7 +448,6 @@ class App:
         status_surf = self.font_status.render(msg, True, Colors.TEXT_STATUS)
         self.screen.blit(status_surf, (16, status_y))
 
-       
         self._draw_separator(screen_h - 58)
 
     def _draw_canvas_grid(self):
@@ -433,6 +461,7 @@ class App:
     def draw_buttons(self):
         for btn in self.mode_buttons:
             btn.draw(self.screen)
+        self.physics_button.draw(self.screen)
         if App.getAppMode() == "animate":
             for ctrl in self.anim_controls:
                 ctrl.draw(self.screen)
@@ -448,16 +477,14 @@ class App:
     def getAppMode(cls):
         return cls.__mode
 
-  
-
     def run(self):
         while self.running:
             self.screen.fill(Colors.BG_CANVAS)
+            frame_time = self.clock.tick(60)
             self.handleUserInput()
             self._draw_canvas_grid()
-            self.render.draw_graph()
+            self.render.draw_graph(delta_t=frame_time / 16.0)
             self.render.updateAnimation(self.clock)
             self.drawPanel()
             self.draw_buttons()
             pygame.display.flip()
-            self.clock.tick(60)
